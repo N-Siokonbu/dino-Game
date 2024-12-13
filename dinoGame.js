@@ -1,6 +1,6 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const imageNames = ['bird', 'cactus', 'dino', 'circle'];
+const imageNames = ['bird', 'cactus', 'dino'];
 
 //　グローバルなgameオブジェクト
 const game = {
@@ -13,6 +13,20 @@ const game = {
 };
 
 //　複数画像読み込み
+let imageLoadCounter = 0;
+for (const imageName of imageNames) {
+    const imagePath = `image/${imageName}.png`;
+    game.image[imageName] = new Image();
+    game.image[imageName].src = imagePath;
+    game.image[imageName].onload = () => {
+        imageLoadCounter += 1;
+        if(imageLoadCounter === imageNames.length) {
+            console.log('画像のロードが完了しました。');
+            init();
+        }
+    }
+}
+
 function init() {
     game.counter = 0;
     game.enemys = [];
@@ -20,7 +34,7 @@ function init() {
     game.score = 0;
     createDino();
     game.timer = setInterval(ticker, 30);
-};
+}
 
 function ticker() {
     //画面クリア
@@ -49,7 +63,7 @@ function ticker() {
     //　カウンタの更新
     game.score += 1;
     game.counter = (game.counter + 1) % 1000000;
-};
+}
 
 function createDino() {
     game.dino = {
@@ -60,7 +74,7 @@ function createDino() {
         height: game.image.dino.height,
         image: game.image.dino
     }
-};
+}
 
 function createCactus() {
     game.enemys.push({
@@ -83,7 +97,7 @@ function createBird() {
         moveX: -15,
         image: game.image.bird
     });
-};
+}
 
 function moveDino() {
     game.dino.y += game.dino.moveY;
@@ -93,7 +107,7 @@ function moveDino() {
     } else {
         game.dino.moveY += 3;
     }
-};
+}
 
 function moveEnemys() {
     for(const enemy of game.enemys) {
@@ -101,22 +115,22 @@ function moveEnemys() {
     }
     // 画面外に出たキャラクタを配列から削除
     game.enemys = game.enemys.filter(enemy => enemy.x > -enemy.width);
-};
+}
 
 function drawDino() {
     ctx.drawImage(game.image.dino, game.dino.x - game.dino.width / 2, game.dino.y - game.dino.height / 2);
-};
+}
 
 function drawEnemys() {
     for(const enemy of game.enemys) {
         ctx.drawImage(enemy.image, enemy.x - enemy.width /2, enemy.y - enemy.height / 2);
     }
-};
+}
 
 function drawScore() {
     ctx.font = '24px serif';
     ctx.fillText(`score: ${game.score}`, 0, 30);
-};
+}
 
 
 function hitCheck() {
@@ -131,7 +145,7 @@ function hitCheck() {
             clearInterval(game.timer)
         }
     }
-};
+}
 
 document.onkeydown = (e) => {
     if(e.code === 'Space' && game.dino.moveY === 0) {
