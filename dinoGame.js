@@ -1,6 +1,6 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const imageNames = ['bird', 'cactus', 'dino'];
+const imageNames = ['bird', 'cactus', 'dino', 'background'];
 
 //　グローバルなgameオブジェクト
 const game = {
@@ -33,6 +33,7 @@ function init() {
     game.isGameOver = false;
     game.score = 0;
     createDino();
+    createBackGround();
     game.timer = setInterval(ticker, 30);
 }
 
@@ -51,11 +52,13 @@ function ticker() {
     // キャラクタの移動
     moveDino(); //　恐竜の移動
     moveEnemys(); //敵キャラクタの移動
+    moveBackGround(); // 背景の移動
 
     //描画
     drawDino(); //　恐竜の描画
     drawEnemys(); // 敵キャラクタの描画
-    drawScore();
+    drawScore(); //スコアの描画
+    drawBackGround(); // 背景の描画
 
     // 当たり判定
     hitCheck();
@@ -99,6 +102,17 @@ function createBird() {
     });
 }
 
+function createBackGround() {
+    game.background = {
+        x: game.image.background.width / 2,
+        y: canvas.height - game.image.background.height / 2,
+        moveX: -10,
+        width: game.image.background.width,
+        height: game.image.background.height,
+        image: game.image.background
+    }
+}
+
 function moveDino() {
     game.dino.y += game.dino.moveY;
     if (game.dino.y >= canvas.height - game.dino.height / 2) {
@@ -117,6 +131,14 @@ function moveEnemys() {
     game.enemys = game.enemys.filter(enemy => enemy.x > -enemy.width);
 }
 
+function moveBackGround() {
+    for(const bg of game.background) {
+        bg.x += bg.moveX;
+    }
+    // 画面外に出た時に削除
+    game.background = game.background.filter(bg => bg.x > -bg.width);
+}
+
 function drawDino() {
     ctx.drawImage(game.image.dino, game.dino.x - game.dino.width / 2, game.dino.y - game.dino.height / 2);
 }
@@ -130,6 +152,10 @@ function drawEnemys() {
 function drawScore() {
     ctx.font = '24px serif';
     ctx.fillText(`score: ${game.score}`, 0, 30);
+}
+
+function drawBackGround() {
+    ctx.drawImage(game.image.background, game.background.x - game.background.width / 2, game.background.y - game.background.height / 2);
 }
 
 
